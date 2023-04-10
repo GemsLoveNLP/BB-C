@@ -1,5 +1,8 @@
+import numpy as np
+import random as rd
+
 orientation_list = [ [[1,0],[0,1]], [[0,1],[-1,0]], [[-1,0],[0,-1]], [[0,-1],[1,0]] ] 
-shift_dict = { "L": [[0,0], [0,1], [1,1], [1,0]], "D": [[0,0], [2,0], [1,-1], [0,-1]]}
+shift_dict = { "L": [[0,0], [0,1], [1,1], [1,0]], "I": [[0,0], [0,1], [1,1], [1,0]]}
 
 def transform_hole(hole, orientation, piece):    
     matrix = np.array(orientation_list[orientation])
@@ -136,5 +139,13 @@ class game_board:
                 if self.randomize(piece,debug):
                     if debug:
                         print(f"randomize_pieces --> success {piece.piece}")
-                    break  
+                    break 
+
+main = game_board()
+setup()
+print(main)
+for _ in range(10):
+    main.randomize_pieces([L,F,I])
+    print(main) 
+    main.clear()
                  
