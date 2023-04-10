@@ -1,5 +1,6 @@
 import numpy as np
 import random as rd
+import time as t
 
 orientation_list = [ [[1,0],[0,1]], [[0,1],[-1,0]], [[-1,0],[0,-1]], [[0,-1],[1,0]] ] 
 shift_dict = { "L": [[0,0], [0,1], [1,1], [1,0]], "I": [[0,0], [0,1], [1,1], [1,0]]}
@@ -144,8 +145,11 @@ class game_board:
 main = game_board()
 setup()
 print(main)
-for _ in range(10):
+start = t.time()
+for _ in range(100):
     main.randomize_pieces([L,F,I])
     print(main) 
     main.clear()
+end = t.time()
+print(end-start)
                  
