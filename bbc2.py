@@ -3,7 +3,15 @@ import random as rd
 # setup
 GRID_SIZE = 5
 COLORS = ['r','o','y','g','b','p']
-INFOS = {'r': ['FF0000', 'RED'], 'o': ['FF8800', 'ORANGE'], 'y': ['FFFF00', 'YELLOW'], 'g': ['00FF00', 'GREEN'], 'b': ['0000FF', 'BLUE'], 'p': ['CC00FF', 'PURPLE']}
+INFOS = {'r': ['crimson', 'RED'], 'o': ['darkorange', 'ORANGE'], 'y': ['gold', 'YELLOW'], 'g': ['chartreuse3', 'GREEN'], 'b': ['steelblue2', 'BLUE'], 'p': ['mediumpurple', 'PURPLE']}
+size = width, height = (800,800)
+
+# transform hex into correct form
+def hex_to_dec(HEX):
+    r = int(HEX[0:2],base=16)
+    g = int(HEX[2:4],base=16)
+    b = int(HEX[4:6],base=16)
+    return r,g,b
 
 # randomize n color(s) from COLORS. return str(color) if n=1 else return a list of colors
 def rand_color(n=1):    
@@ -14,7 +22,7 @@ def rand_color(n=1):
     return copy[:min(n,len(COLORS))]
 
 # return a dict of the color for the text_screen. keys = 'text','text_color','background'
-def text_screen():
+def text_screen_random():
     temp = rand_color(3)
     dic = dict()
     dic['text'] = temp[0]
@@ -53,20 +61,23 @@ class cell:
         self.status = status
 
 # generate a color board which has at least n copy of all colors
-def color_board(board_size=GRID_SIZE**2, num_players=4, copy=1):
+def color_board(board_size=GRID_SIZE**2, num_players=4, copy=3):
     # color = the correct color
     # board size = area of board
     # ---------------------------------------------
     l = []
-    l += [cell(color) for color in COLORS]*copy
+    for _ in range(copy):
+        l += [cell(color) for color in COLORS]
     needed = board_size - len(COLORS)
     color_pool = rand_color(needed//num_players+1)
     for color in color_pool:
         diff = board_size - len(l)
         if diff >= num_players:
-            l+=[cell(color)]*num_players
+            for _ in range(num_players):
+                l+=[cell(color)]
         else:
-            l+=[cell(color)]*diff
+            for _ in range(diff):
+                l+=[cell(color)]
     rd.shuffle(l)
     return l
 
@@ -93,17 +104,29 @@ class game_board:
     def cell_status(self,player_num,row,col):
         self.board[row][col].status = player_num
 
+    def player_place_marker(self,pN,row,col):
+        self.cell_status(pN.num, row, col)
+        pN.add_score()
+
+
 # players
 class player:
     # player number, player name, their score
-    def __init__(self, num, name, score) -> None:
+    def __init__(self, num, name, score=0) -> None:
         self.num = num
         self.name = name
         self.score = score
 
+    def add_score(self, n=1):
+        self.score += n
+
 # ---------------------------------------------------------------------------------------------------
-cb_matrix = to_square_matrix(color_board())
-main = game_board(cb_matrix)
-print(main)
-main.cell_status(2,3,3)
-print(main)
+
+def main():
+    cb_matrix = to_square_matrix(color_board())
+    main = game_board(cb_matrix)
+    print(main)
+    main.cell_status(2,3,3)
+    print(main)
+
+# main()
