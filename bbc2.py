@@ -25,16 +25,20 @@ def hex_to_dec(HEX):
     return r,g,b
 
 # randomize n color(s) from COLORS. return str(color) if n=1 else return a list of colors
-def rand_color(n=1):    
-    copy = [color for color in COLORS]
+def rand_color(colorful=False, n=1):   
+    if colorful:
+        colors = COLORS_EXTENDED
+    else:
+        colors = COLORS 
+    copy = [color for color in colors]
     rd.shuffle(copy)
     if n == 1:
         return copy[0]
-    return copy[:min(n,len(COLORS))]
+    return copy[:min(n,len(colors))]
 
 # return a dict of the color for the text_screen. keys = 'text','text_color','background'
-def text_screen_random():
-    temp = rand_color(3)
+def text_screen_random(colorful=False):
+    temp = rand_color(colorful=colorful,n=3)
     dic = dict()
     dic['text'] = temp[0]
     dic['text_color'] = temp[1]

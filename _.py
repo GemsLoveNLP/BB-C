@@ -17,7 +17,7 @@ main = bbc2.game_board(cb_matrix)
 print(main)
 
 def text_screen():
-    d = bbc2.text_screen_random()
+    d = bbc2.text_screen_random(colorful=True)
     background_surface = pygame.Surface((700,700))
     background_surface.fill(bbc2.INFOS[d['background']][0])
     screen.blit(background_surface,(0,0))
@@ -59,9 +59,9 @@ while True:
             pygame.quit()
             exit()
 
-    screen.blit(test_surface,(0,0)) #(x,y)
-    # text_screen()
-    color_screen_example()
+    # screen.blit(test_surface,(0,0)) #(x,y)
+    text_screen()
+    # color_screen_example()
     
     pygame.display.update()
     
