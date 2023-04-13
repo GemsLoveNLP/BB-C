@@ -47,7 +47,7 @@ def color_screen_example():
     for y in range(5):
         for x in range(5):
             color_pixel = pygame.surface.Surface((140,140))
-            color_pixel.fill(bbc2.INFOS[bbc2.to_square_matrix(bbc2.color_board())[y][x].color][0])
+            color_pixel.fill(bbc2.INFOS[bbc2.to_square_matrix(bbc2.color_board(colorful=True))[y][x].color][0])
             screen.blit(color_pixel,(140*x,140*y))
     bar_surface = pygame.image.load('bar.png')
     screen.blit(bar_surface,(0,0))
@@ -66,5 +66,5 @@ while True:
     pygame.display.update()
     
     time.sleep(1)
-    clock.tick(60)
+    clock.tick(30)
 

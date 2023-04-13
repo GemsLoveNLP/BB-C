@@ -2,8 +2,19 @@ import random as rd
 
 # setup
 GRID_SIZE = 5
-COLORS = ['r','o','y','g','b','p']
-INFOS = {'r': ['crimson', 'RED'], 'o': ['darkorange', 'ORANGE'], 'y': ['gold', 'YELLOW'], 'g': ['chartreuse3', 'GREEN'], 'b': ['steelblue2', 'BLUE'], 'p': ['mediumpurple', 'PURPLE']}
+COLORS = ['r','o','y','l','b','v']
+COLORS_EXTENDED = ['r','o','y','l','g','b','i','v','p']
+INFOS = {
+        'r': ['crimson', 'RED'],
+        'o': ['darkorange', 'ORANGE'],
+        'y': ['gold', 'YELLOW'],
+        'l': ['chartreuse2','LIME'],
+        'g': ['springgreen4','GREEN'],
+        'b': ['steelblue2', 'BLUE'],
+        'i': ['dodgerblue3','INDIGO'],
+        'v': ['mediumpurple','VIOLET'],
+        'p': ['palevioletred1', 'PINK']
+        }
 size = width, height = (800,800)
 
 # transform hex into correct form
@@ -61,14 +72,18 @@ class cell:
         self.status = status
 
 # generate a color board which has at least n copy of all colors
-def color_board(board_size=GRID_SIZE**2, num_players=4, copy=3):
+def color_board(board_size=GRID_SIZE**2, num_players=4, copy=3, colorful=False):
     # color = the correct color
     # board size = area of board
     # ---------------------------------------------
+    if colorful:
+        colors = COLORS_EXTENDED
+    else:
+        colors = COLORS
     l = []
     for _ in range(copy):
-        l += [cell(color) for color in COLORS]
-    needed = board_size - len(COLORS)
+        l += [cell(color) for color in colors]
+    needed = board_size - len(colors)
     color_pool = rand_color(needed//num_players+1)
     for color in color_pool:
         diff = board_size - len(l)
