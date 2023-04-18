@@ -4,6 +4,7 @@ import random as rd
 GRID_SIZE = 5
 COLORS = ['r','o','y','l','b','v']
 COLORS_EXTENDED = ['r','o','y','l','g','b','i','v','p']
+RANK_COLORS = ['goldenrod', 'silver', 'chocolate1', 'azure4'] 
 INFOS = {
         'r': ['crimson', 'RED'],
         'o': ['darkorange', 'ORANGE'],
@@ -80,6 +81,7 @@ def color_board(board_size=GRID_SIZE**2, num_players=4, copy=3, colorful=False):
     # color = the correct color
     # board size = area of board
     # ---------------------------------------------
+ 
     if colorful:
         colors = COLORS_EXTENDED
     else:
@@ -87,16 +89,23 @@ def color_board(board_size=GRID_SIZE**2, num_players=4, copy=3, colorful=False):
     l = []
     for _ in range(copy):
         l += [cell(color) for color in colors]
-    needed = board_size - len(colors)
-    color_pool = rand_color(needed//num_players+1)
-    for color in color_pool:
-        diff = board_size - len(l)
-        if diff >= num_players:
-            for _ in range(num_players):
-                l+=[cell(color)]
-        else:
-            for _ in range(diff):
-                l+=[cell(color)]
+    # ------------------------------------------
+    # for color in color_pool:
+    #     print('loop start')
+    #     diff = board_size - len(l)
+    #     if diff >= num_players:
+    #         print('case1')
+    #         for _ in range(num_players):
+    #             l+=[cell(color)]
+    #     else:
+    #         print('case2')
+    #         for _ in range(diff):
+    #             l+=[cell(color)]
+    #     print(len(l))
+    # ---------------------------------------
+    rest = board_size - len(l)
+    for i in range(rest):
+        l.append(cell(colors[rd.randint(0,len(colors)-1)]))
     rd.shuffle(l)
     return l
 
@@ -142,7 +151,8 @@ class player:
 # ---------------------------------------------------------------------------------------------------
 
 def main():
-    cb_matrix = to_square_matrix(color_board())
+    cb = color_board()
+    cb_matrix = to_square_matrix(cb)
     main = game_board(cb_matrix)
     print(main)
     main.cell_status(2,3,3)
