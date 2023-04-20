@@ -5,7 +5,7 @@ import time
 
 
 # config here-----
-SIZE = 800      #|
+SIZE = 700   #|
 # ----------------
 
 pygame.init()
@@ -16,9 +16,10 @@ clock = pygame.time.Clock()
 test_surface = pygame.Surface((700,700))
 test_surface.fill('royalblue4')
 
-cb_matrix = bbc2.to_square_matrix(bbc2.color_board())
-main = bbc2.game_board(cb_matrix)
-print(main)
+
+# cb_matrix = bbc2.to_square_matrix(bbc2.color_board())
+# main = bbc2.game_board(cb_matrix)
+# print(main)
 
 def text_screen(size=700):
     test_font = pygame.font.Font(None,SIZE//8)
@@ -56,7 +57,7 @@ def color_screen_example(size=700):
             color_pixel = pygame.surface.Surface((size//5,size//5))
             color_pixel.fill(bbc2.INFOS[cb_matrix[y][x].color][0])
             screen.blit(color_pixel,(size//5*x,size//5*y))
-    bar_surface = pygame.image.load('bar.png')
+    bar_surface = pygame.image.load('5x5 Grid.png')
     trans_bar = pygame.transform.scale(bar_surface,(size,size))
     screen.blit(trans_bar,(0,0))
 
@@ -75,6 +76,6 @@ while True:
     
     pygame.display.update()
     
-    time.sleep(1)
+    time.sleep(5)
     clock.tick(30)
 

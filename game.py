@@ -2,10 +2,11 @@ import pygame
 from sys import exit
 import bbc2
 import time
+import random as rd
 
 
 # config here-----
-SIZE = 200      #|
+SIZE = 700      #|
 ROUND = 10      #|
 # ----------------
 
@@ -20,7 +21,7 @@ p3 = bbc2.player(3,'Nul',5)
 p4 = bbc2.player(4,'Dsir',7)
 player_list = [p1, p2, p3, p4]
 
-cb_matrix = bbc2.to_square_matrix(bbc2.color_board())
+cb_matrix = bbc2.to_square_matrix(bbc2.color_board('b'))
 main = bbc2.game_board(cb_matrix)
 print(main)
 main.player_place_marker(p1,1,1)
@@ -49,32 +50,49 @@ def text_screen(size=700):
     screen.blit(text_surface4,text_rect_4)
     return d
 
-def color_screen(size=700):
-    for y in range(5):
-        for x in range(5):
-            color_pixel = pygame.surface.Surface((size//5,size//5))
-            color_pixel.fill(bbc2.INFOS[main.board[y][x].color][0])
-            screen.blit(color_pixel,(size//5*x,size//5*y))
-            if main.board[y][x].status != 0:
-                icon_surface = pygame.image.load(f'{main.board[y][x].status}.png')
-                trans_icon = pygame.transform.scale(icon_surface,(size//5,size//5))
-                screen.blit(trans_icon,(size//5*x,size//5*y))
-    bar_surface = pygame.image.load('bar.png')
-    trans_bar = pygame.transform.scale(bar_surface,(size,size))
-    screen.blit(trans_bar,(0,0))
+# def color_screen_old(size=700):
+#     for y in range(5):
+#         for x in range(5):
+#             color_pixel = pygame.surface.Surface((size//5,size//5))
+#             color_pixel.fill(bbc2.INFOS[main.board[y][x].color][0])
+#             screen.blit(color_pixel,(size//5*x,size//5*y))
+#             if main.board[y][x].status != 0:
+#                 icon_surface = pygame.image.load(f'{main.board[y][x].status}.png')
+#                 trans_icon = pygame.transform.scale(icon_surface,(size//5,size//5))
+#                 screen.blit(trans_icon,(size//5*x,size//5*y))
+#     bar_surface = pygame.image.load('5x5 Grid.png')
+#     trans_bar = pygame.transform.scale(bar_surface,(size,size))
+#     screen.blit(trans_bar,(0,0))
 
-def color_screen_example(size=700):
-    cb_matrix = bbc2.to_square_matrix(bbc2.color_board(colorful=True))
+def color_screen(correct_color, size=700):
+    cb_matrix = bbc2.to_square_matrix(bbc2.color_board(correct_color,colorful=True))
     for y in range(5):
         for x in range(5):
             color_pixel = pygame.surface.Surface((size//5,size//5))
             color_pixel.fill(bbc2.INFOS[cb_matrix[y][x].color][0])
             screen.blit(color_pixel,(size//5*x,size//5*y))
-    bar_surface = pygame.image.load('bar.png')
+    bar_surface = pygame.image.load('5x5 Grid.png')
     trans_bar = pygame.transform.scale(bar_surface,(size,size))
     screen.blit(trans_bar,(0,0))
+    return cb_matrix
+
+def game_screens(repetition=0, size=700, difficulty=bbc2.NORMAL):
+    if repetition < 1:
+        repetition = rd.randint(1,difficulty['max'])
+    correct_color_list = []
+    for i in range(repetition):
+        correct_color = text_screen(size=size)
+        pygame.display.update()
+        correct_color_list.append(correct_color['text_color'])
+        time.sleep(difficulty['wait'])
+    true_correct_color_list = list(set(correct_color_list))
+    color_screen(true_correct_color_list,size=size)
+
 
 def score_screen(size=700):
+    background = pygame.surface.Surface((size,size))
+    background.fill('black')
+    screen.blit(background,(0,0))
     header_font = pygame.font.Font(None,size//8)
     header = header_font.render('Score', True, 'yellow')
     header_rect = header.get_rect(center=(size//2,size//9))
@@ -92,22 +110,31 @@ def score_screen(size=700):
         screen.blit(body, body_rect)
         i+=1
 
-rounds = 0
+status = 'begin'
 
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
+        if status == 'hold' and event.type == pygame.KEYDOWN:
+            print("event1")
+            status = 'score'
+        elif status == 'score' and event.type == pygame.KEYDOWN:
+            print("event2")
+            status = 'game'
 
-    text_screen(size=SIZE)
+    print('start',status)
 
-    # color_screen(size=SIZE)
+    if status == 'begin':
+        status = 'game'
+    elif status == 'score':
+        score_screen(size=SIZE)
+    elif status == 'game':
+        game_screens()
+        status = 'hold'
 
-    # score_screen(size=SIZE)
-    
     pygame.display.update()
-    
-    time.sleep(1)
+    time.sleep(bbc2.NORMAL['wait'])
     clock.tick(30)
 

@@ -2,6 +2,8 @@ import random as rd
 
 # setup
 GRID_SIZE = 5
+NORMAL = {'wait':1, 'max':2}
+HARD = {'wait':0.8, 'max':3}
 COLORS = ['r','o','y','l','b','v']
 COLORS_EXTENDED = ['r','o','y','l','g','b','i','v','p']
 RANK_COLORS = ['goldenrod', 'silver', 'chocolate1', 'azure4'] 
@@ -26,7 +28,7 @@ def hex_to_dec(HEX):
     return r,g,b
 
 # randomize n color(s) from COLORS. return str(color) if n=1 else return a list of colors
-def rand_color(colorful=False, n=1):   
+def rand_color(colorful=True, n=1):   
     if colorful:
         colors = COLORS_EXTENDED
     else:
@@ -38,7 +40,7 @@ def rand_color(colorful=False, n=1):
     return copy[:min(n,len(colors))]
 
 # return a dict of the color for the text_screen. keys = 'text','text_color','background'
-def text_screen_random(colorful=False):
+def text_screen_random(colorful=True):
     temp = rand_color(colorful=colorful,n=3)
     dic = dict()
     dic['text'] = temp[0]
@@ -77,32 +79,21 @@ class cell:
         self.status = status
 
 # generate a color board which has at least n copy of all colors
-def color_board(board_size=GRID_SIZE**2, num_players=4, copy=3, colorful=False):
-    # color = the correct color
+def color_board(correct_colors, board_size=GRID_SIZE**2, num_players=4, negative=1, colorful=True):
+    # correct_colors = the list of correct_color which itself is a member of the COLORS lists family
     # board size = area of board
     # ---------------------------------------------
- 
     if colorful:
-        colors = COLORS_EXTENDED
+        colors = list(COLORS_EXTENDED)
     else:
-        colors = COLORS
+        colors = list(COLORS)
+    print(correct_colors)
+    for correct_color in correct_colors:
+        colors.remove(correct_color)
+    copy = num_players - negative
     l = []
     for _ in range(copy):
-        l += [cell(color) for color in colors]
-    # ------------------------------------------
-    # for color in color_pool:
-    #     print('loop start')
-    #     diff = board_size - len(l)
-    #     if diff >= num_players:
-    #         print('case1')
-    #         for _ in range(num_players):
-    #             l+=[cell(color)]
-    #     else:
-    #         print('case2')
-    #         for _ in range(diff):
-    #             l+=[cell(color)]
-    #     print(len(l))
-    # ---------------------------------------
+        l += [cell(correct_color) for correct_color in correct_colors]
     rest = board_size - len(l)
     for i in range(rest):
         l.append(cell(colors[rd.randint(0,len(colors)-1)]))
