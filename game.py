@@ -5,13 +5,13 @@ import time
 import random as rd
 
 
-#todo config here-------------
+#todo config here -------------
 SIZE = 700      
 ROUND = 10      
-FRAMERATE = 30  
+FRAMERATE = 60
 ANIMATION_THRESHOLD = 30
 NUM_PLAYER = 4
-#todo ------------------------
+#todo -------------------------
 
 pygame.init()
 screen = pygame.display.set_mode((SIZE,SIZE))
@@ -35,6 +35,7 @@ player_list = p_list[0:NUM_PLAYER]
 # main.player_place_marker(p4,1,4)
 # print(main)
 
+# create a begin screen
 def begin_screen(size=700):
     background = pygame.surface.Surface((size,size))
     background.fill('black')
@@ -44,6 +45,7 @@ def begin_screen(size=700):
     header_rect = header.get_rect(center=(size//2,size//2))
     screen.blit(header, header_rect)
 
+# create a text screen and return the solution
 def text_screen(size=700):
     test_font = pygame.font.Font(None,size//8)
     d = bbc2.text_screen_random(colorful=True)
@@ -78,7 +80,9 @@ def text_screen(size=700):
 #     trans_bar = pygame.transform.scale(bar_surface,(size,size))
 #     screen.blit(trans_bar,(0,0))
 
+# create a color screen and return the associated 5x5 list of cell objects 
 def color_screen(correct_color, size=700):
+    # correct_color is a list that contains the correct color initials
     cb_matrix = bbc2.to_square_matrix(bbc2.color_board(correct_color,colorful=True,num_players=NUM_PLAYER))
     for y in range(5):
         for x in range(5):
@@ -90,7 +94,9 @@ def color_screen(correct_color, size=700):
     screen.blit(trans_bar,(0,0))
     return cb_matrix
 
+# create 1-4 text screen before creating a color screen with the correct colors
 def game_screens(repetition=0, size=700, difficulty=bbc2.NORMAL):
+    # repetition = number of times the text screen would show
     global correct_color_list
     if repetition < 1:
         repetition = rd.randint(1,difficulty['max'])
@@ -103,7 +109,7 @@ def game_screens(repetition=0, size=700, difficulty=bbc2.NORMAL):
     true_correct_color_list = list(set(correct_color_list))
     return color_screen(true_correct_color_list,size=size)
 
-
+# create a screen of dynamic scores rank from best to worst vertically
 def score_screen(size=700):
     background = pygame.surface.Surface((size,size))
     background.fill('black')
@@ -128,6 +134,7 @@ def score_screen(size=700):
     inst_rect = inst.get_rect(center=(size//2,size - size//6))
     screen.blit(inst, inst_rect)
 
+# animate a png to get progressively larger
 def animate_circle(xy_list, scale, size=700):
     # x, y is coordinate of grid slot 
     coor_list = []
@@ -146,6 +153,7 @@ def animate_circle(xy_list, scale, size=700):
         fx_rect = fx.get_rect(center=(true_x,true_y))
         screen.blit(fx,fx_rect)
 
+# draw a board from main
 def static_board_screen(size=SIZE):
     for y in range(5):
         for x in range(5):
@@ -172,9 +180,10 @@ def find_correct_grid():
     xy_list = []
     for correct_color in correct_color_list:
         escape = False
-        for x in range(5):
-            for y in range(5):
-                if main.board[x][y].color == correct_color:
+        for y in range(5):
+            for x in range(5):
+                if main.board[y][x].color == correct_color:
+                    print(x,y)
                     xy_list.append((x,y))
                     escape = True
                 if escape:break
