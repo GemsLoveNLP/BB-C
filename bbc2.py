@@ -1,22 +1,20 @@
 import random as rd
 
 # setup
-GRID_SIZE = 5
-NORMAL = {'wait':1, 'max':2}
-HARD = {'wait':0.8, 'max':3}
+GRID_SIZE = 6
 COLORS = ['r','o','y','l','b','v']
-COLORS_EXTENDED = ['r','o','y','l','g','b','i','v','p']
+COLORS_EXTENDED = ['r','o','y','g','m','b','w','v','p']
 RANK_COLORS = ['goldenrod', 'silver', 'chocolate1', 'azure4'] 
 INFOS = {
-        'r': ['crimson', 'RED'],
-        'o': ['darkorange', 'ORANGE'],
-        'y': ['gold', 'YELLOW'],
-        'l': ['chartreuse2','LIME'],
-        'g': ['springgreen4','GREEN'],
-        'b': ['steelblue2', 'BLUE'],
-        'i': ['dodgerblue3','INDIGO'],
-        'v': ['mediumpurple','VIOLET'],
-        'p': ['palevioletred1', 'PINK']
+        'r': [(51, 115, 219), 'RED'],
+        'o': [(255, 140, 26), 'ORANGE'],
+        'y': [(255, 204, 51), 'YELLOW'], 
+        'g': [(44, 207, 35), 'GREEN'], 
+        'm': [(156, 244, 223), 'MINT'], 
+        'b': [(229, 26, 26), 'BLUE'], 
+        'w': [(183, 9, 105), 'WINE'], 
+        'v': [(102, 45, 145), 'PURPLE'],
+        'p': [(255, 179, 179), 'PINK']
         }
 size = width, height = (800,800)
 
@@ -40,8 +38,18 @@ def rand_color(colorful=True, n=1):
     return copy[:min(n,len(colors))]
 
 # return a dict of the color for the text_screen. keys = 'text','text_color','background'
-def text_screen_random(colorful=True):
-    temp = rand_color(colorful=colorful,n=3)
+def text_screen_random(colorful=True, color_to_not_include=[]):
+    if colorful:
+        colors = COLORS_EXTENDED
+    else:
+        colors = COLORS 
+    color_list = [color for color in colors]
+    color_set = set(color_list)
+    exclude_set = set(color_to_not_include)
+    copy_set = color_set.difference(exclude_set)
+    copy = list(copy_set)
+    rd.shuffle(copy)
+    temp = copy
     dic = dict()
     dic['text'] = temp[0]
     dic['text_color'] = temp[1]
@@ -82,6 +90,7 @@ class cell:
 def color_board(correct_colors, board_size=GRID_SIZE**2, num_players=4, negative=1, colorful=True):
     # correct_colors = the list of correct_color which itself is a member of the COLORS lists family
     # board size = area of board
+    # negative = number of player that will not get the square
     # ---------------------------------------------
     if colorful:
         colors = list(COLORS_EXTENDED)
