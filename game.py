@@ -10,13 +10,13 @@ from pyvidplayer import Video
 #todo config here -------------
 DIFF = {'NORMAL':{'wait':1, 'max':2},'HARD':{'wait':0.8, 'max':5}}
 
-SIZE = 702      
+SIZE = 750      
 ROUND = 10      
-FRAMERATE = 60
-ANIMATION_THRESHOLD = 30
+FRAMERATE = 30
+ANIMATION_THRESHOLD = 20
 NUM_PLAYER = 4
 GRID = 6
-DIFFICULTY = 'NORMAL'
+DIFFICULTY = 'HARD'
 #todo -------------------------
 
 pygame.init()
@@ -26,7 +26,7 @@ clock = pygame.time.Clock()
 
 p1 = bbc2.player(1,'Sirkle')
 p2 = bbc2.player(2,'Sektor')
-p3 = bbc2.player(3,'Daimon')
+p3 = bbc2.player(3,'Soapoo')
 p4 = bbc2.player(4,'BeeHex')
 p_list = [p1, p2, p3, p4]
 player_list = p_list[0:NUM_PLAYER]
@@ -41,8 +41,14 @@ player_list = p_list[0:NUM_PLAYER]
 # main.player_place_marker(p4,1,4)
 # print(main)
 
+# play a folder frame by frame
+def play_vid(dir,i,size=700):
+    img = pygame.image.load(dir)
+    trans_img = pygame.transform.scale(img,(size,size))
+    screen.blit(trans_img,(0,0))
+
 # create a begin screen
-def begin_screen(size=700):
+def begin_screen(i,size=700):
     # background = pygame.surface.Surface((size,size))
     # background.fill('black')
     # screen.blit(background,(0,0))
@@ -50,7 +56,7 @@ def begin_screen(size=700):
     # header = header_font.render('Press any key to start', True, 'yellow')
     # header_rect = header.get_rect(center=(size//2,size//2))
     # screen.blit(header, header_rect)
-    img = pygame.image.load('loading.png')
+    img = pygame.image.load(f"C:\\Users\\user\\Desktop\\Python\\BBC\\tutorial\\tutorial ({i%531}).png")
     trans_img = pygame.transform.scale(img,(size,size))
     screen.blit(trans_img,(0,0))
 
@@ -98,7 +104,7 @@ def color_screen(correct_color, size=SIZE):
             color_pixel = pygame.surface.Surface((size//GRID,size//GRID))
             color_pixel.fill(bbc2.INFOS[cb_matrix[y][x].color][0])
             screen.blit(color_pixel,(size//GRID*x,size//GRID*y))
-    bar_surface = pygame.image.load('6x6 try.png')
+    bar_surface = pygame.image.load('6x6.png')
     trans_bar = pygame.transform.scale(bar_surface,(size,size))
     screen.blit(trans_bar,(0,0))
     return cb_matrix
@@ -173,7 +179,7 @@ def static_board_screen(size=SIZE):
                 icon_surface = pygame.image.load(f'{main.board[y][x].status}.png')
                 trans_icon = pygame.transform.scale(icon_surface,(size//GRID,size//GRID))
                 screen.blit(trans_icon,(size//GRID*x,size//GRID*y))
-    bar_surface = pygame.image.load('6x6 try.png')
+    bar_surface = pygame.image.load('6x6.png')
     trans_bar = pygame.transform.scale(bar_surface,(size,size))
     screen.blit(trans_bar,(0,0))
 
@@ -214,6 +220,8 @@ def find_correct_grid():
 def main_game():
     global main_board
     
+    video_status = 0
+
     status = 'begin'
     animation_count = 0
 
@@ -224,6 +232,9 @@ def main_game():
                 exit()
             if status == 'begin' and event.type == pygame.KEYDOWN:
                 print("event0")
+                status = 'select_player'
+            elif status == 'select_player' and event.type == pygame.KEYDOWN:
+                print("event0.5")
                 status = 'game'
             elif status == 'hold' and event.type == pygame.KEYDOWN:
                 print("event1")
@@ -240,7 +251,13 @@ def main_game():
         # print(status)
 
         if status == 'begin':
-            begin_screen(size=SIZE)
+            name = f"C:\\Users\\user\\Desktop\\Python\\BBC\\tutorial\\tutorial ({video_status%531}).png"
+            play_vid(name,video_status,size=SIZE)
+            video_status+=1
+        elif status == 'select_player':
+            name = f"C:\\Users\\user\\Desktop\\Python\\BBC\\player_select\\player_number ({video_status%2683}).png"
+            play_vid(name,video_status,size=SIZE)
+            video_status+=1
         elif status == 'score':
             score_screen(size=SIZE)
         elif status == 'game':
@@ -262,48 +279,56 @@ def main_game():
         clock.tick(FRAMERATE)
 
 
-def full_game(name, name2, size=700):
-    global NUM_PLAYER, DIFFICULTY
+# def full_game(name, name2, size=700):
+#     global NUM_PLAYER, DIFFICULTY
 
-    # first video
+#     # first video
 
-    vid = Video(name)
-    vid.set_size((size,size))
+#     vid = Video(name)
+#     vid.set_size((size,size))
 
-    # similar to status, but is used to select the correct video to show
+#     # similar to status, but is used to select the correct video to show
 
-    vid_status = 0
+#     vid_status = 0
 
-    while True:
-        vid.draw(screen, (0,0))
-        pygame.display.update()
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and vid_status == 0:
+#     # vid.draw(screen, (0,0))
+#     # pygame.display.update()
+
+#     while True:
+#         vid.draw(screen, (0,0))
+#         # sprite = pygame.image.load('1.png')
+#         # screen.blit(sprite,(0,0))
+#         pygame.display.update()
+#         for event in pygame.event.get():
+#             if event.type == pygame.QUIT:
+#                 pygame.quit()
+#                 exit()
+#             if event.type == pygame.KEYDOWN and vid_status == 0:
                 
-                #todo set the number of players using the camera
-                NUM_PLAYER = 4
+#                 #todo set the number of players using the camera
+#                 NUM_PLAYER = 4
 
-                vid.close()
+#                 vid.close()
 
-                pygame.display.update()
+#                 pygame.display.update()
 
-                vid_status+=1
-                vid = Video(name2)
-                vid.set_size((size,size))
-                vid.draw(screen, (0,0))
+#                 vid_status+=1
+#                 vid = Video(name2)
+#                 vid.set_size((size,size))
+#                 vid.draw(screen, (0,0))
 
-            elif event.type == pygame.KEYDOWN and vid_status == 1:
+#             elif event.type == pygame.KEYDOWN and vid_status == 1:
                 
-                #todo set the difficulty using the camera
-                DIFFICULTY = 'HARD'
+#                 #todo set the difficulty using the camera
+#                 DIFFICULTY = 'NORMAL'
 
-                vid.close()
+#                 vid.close()
 
-                pygame.display.update()
+#                 pygame.display.update()
 
-                main_game()
+#                 main_game()
 
 
-# main_game()
+main_game()
 
-full_game('Tic Tac Toe Video.mp4', 'Gems.mp4', size=SIZE)
+# full_game('Gems.mp4', 'Gems.mp4', size=SIZE)

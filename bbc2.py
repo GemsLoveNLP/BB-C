@@ -38,6 +38,7 @@ def rand_color(colorful=True, n=1):
     return copy[:min(n,len(colors))]
 
 # return a dict of the color for the text_screen. keys = 'text','text_color','background'
+#! color to not include must also include the text itself
 def text_screen_random(colorful=True, color_to_not_include=[]):
     if colorful:
         colors = COLORS_EXTENDED
