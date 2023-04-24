@@ -41,8 +41,14 @@ player_list = p_list[0:NUM_PLAYER]
 # main.player_place_marker(p4,1,4)
 # print(main)
 
+# get the file name
+def get_file_name(dir, i, folder_size):
+    i = i%folder_size
+    string = dir+"0"*(4-len(str(i)))+str(i)+".png"
+    return string
+
 # play a folder frame by frame
-def play_vid(dir,i,size=700):
+def play_vid(dir,size=700):
     img = pygame.image.load(dir)
     trans_img = pygame.transform.scale(img,(size,size))
     screen.blit(trans_img,(0,0))
@@ -233,6 +239,7 @@ def main_game():
             if status == 'begin' and event.type == pygame.KEYDOWN:
                 print("event0")
                 status = 'select_player'
+                video_status = 0
             elif status == 'select_player' and event.type == pygame.KEYDOWN:
                 print("event0.5")
                 status = 'game'
@@ -251,12 +258,13 @@ def main_game():
         # print(status)
 
         if status == 'begin':
-            name = f"C:\\Users\\user\\Desktop\\Python\\BBC\\tutorial\\tutorial ({video_status%531}).png"
-            play_vid(name,video_status,size=SIZE)
+            directory = "C:\\Users\\user\\Desktop\\Python\\BBC\\intro + player_selection\\start to place to join the game"
+            name = get_file_name(directory, video_status, 3354)
+            play_vid(name,size=SIZE)
             video_status+=1
         elif status == 'select_player':
-            name = f"C:\\Users\\user\\Desktop\\Python\\BBC\\player_select\\player_number ({video_status%2683}).png"
-            play_vid(name,video_status,size=SIZE)
+            name = f"C:\\Users\\user\\Desktop\\Python\\BBC\\player_select\\player_number ({video_status%2683+1}).png"
+            play_vid(name,size=SIZE)
             video_status+=1
         elif status == 'score':
             score_screen(size=SIZE)
