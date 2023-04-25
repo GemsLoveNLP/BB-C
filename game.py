@@ -215,7 +215,9 @@ def find_correct_grid():
 
 # ? status represents the game status
 # ? status list: 
-# ?    - begin = start page to use settings
+# ?    - begin = start page to do num player settings
+# ?    - mode_select = screen to do difficulty settings
+# ?    - tutorial = video of the tutorial
 # ?    - game = display the text then the board
 # ?    - hold = hold the game board in place for checking
 # ?    - animate = animation of placement
@@ -237,14 +239,14 @@ def main_game():
                 pygame.quit()
                 exit()
             if status == 'begin' and event.type == pygame.KEYDOWN:
-                print("event0")
-                status = 'select_player'
+                status = 'mode_select'
                 video_status = 0
-            elif status == 'select_player' and event.type == pygame.KEYDOWN:
-                print("event0.5")
+            elif status == 'mode_select' and event.type == pygame.KEYDOWN:
+                status = 'tutorial'
+                video_status = 0
+            elif status == 'tutorial' and event.type == pygame.KEYDOWN:
                 status = 'game'
             elif status == 'hold' and event.type == pygame.KEYDOWN:
-                print("event1")
                 #!----------------------------------------------
                 for _ in range(len(correct_color_list)):
                     player_list[get_winner()-1].score+=1
@@ -252,7 +254,6 @@ def main_game():
                 animation_count = 0
                 status = 'animate'
             elif status == 'score' and event.type == pygame.KEYDOWN:
-                print("event2")
                 status = 'game'
 
         # print(status)
@@ -265,8 +266,14 @@ def main_game():
             play_vid(name,size=SIZE)
             play_vid(name_anime,size=SIZE//6,coord=(0,0))
             video_status+=1
-        elif status == 'select_player':
-            name = f"C:\\Users\\user\\Desktop\\Python\\BBC\\player_select\\player_number ({video_status%2683+1}).png"
+        elif status == 'mode_select':
+            directory = "C:\\Users\\user\\Desktop\\Python\\BBC\\mode_selection\\mode_selection"
+            name = get_file_name(directory, video_status, 1785)
+            play_vid(name,size=SIZE)
+            video_status+=1
+        elif status == 'tutorial':
+            directory = "C:\\Users\\user\\Desktop\\Python\\BBC\\tutorial\\tutorial"
+            name = get_file_name(directory, video_status, 664)
             play_vid(name,size=SIZE)
             video_status+=1
         elif status == 'score':
