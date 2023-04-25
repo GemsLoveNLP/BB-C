@@ -48,10 +48,10 @@ def get_file_name(dir, i, folder_size):
     return string
 
 # play a folder frame by frame
-def play_vid(dir,size=700):
+def play_vid(dir,size=700, coord = (0,0)):
     img = pygame.image.load(dir)
     trans_img = pygame.transform.scale(img,(size,size))
-    screen.blit(trans_img,(0,0))
+    screen.blit(trans_img,coord)
 
 # create a begin screen
 def begin_screen(i,size=700):
@@ -260,7 +260,10 @@ def main_game():
         if status == 'begin':
             directory = "C:\\Users\\user\\Desktop\\Python\\BBC\\intro + player_selection\\start to place to join the game"
             name = get_file_name(directory, video_status, 3354)
+            directory_anime = "C:\\Users\\user\\Desktop\\Python\\BBC\\effect_circle\\effect_circle"
+            name_anime = get_file_name(directory_anime, video_status, 118)
             play_vid(name,size=SIZE)
+            play_vid(name_anime,size=SIZE//6,coord=(0,0))
             video_status+=1
         elif status == 'select_player':
             name = f"C:\\Users\\user\\Desktop\\Python\\BBC\\player_select\\player_number ({video_status%2683+1}).png"
