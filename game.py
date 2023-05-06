@@ -8,7 +8,7 @@ from pyvidplayer import Video
 
 
 #todo config here -------------
-DIFF = {'NORMAL':{'wait':1, 'max':2},'HARD':{'wait':0.8, 'max':5}}
+DIFF = {'NORMAL':{'wait':1, 'max':2},'HARD':{'wait':0.8, 'max':4}}
 
 SIZE = 750      
 ROUND = 10      
@@ -16,7 +16,7 @@ FRAMERATE = 30
 ANIMATION_THRESHOLD = 20
 NUM_PLAYER = 4
 GRID = 6
-DIFFICULTY = 'HARD'
+DIFFICULTY = 'NORMAL'
 #todo -------------------------
 
 pygame.init()
@@ -62,12 +62,12 @@ def begin_screen(i,size=700):
     # header = header_font.render('Press any key to start', True, 'yellow')
     # header_rect = header.get_rect(center=(size//2,size//2))
     # screen.blit(header, header_rect)
-    img = pygame.image.load(f"C:\\Users\\user\\Desktop\\Python\\BBC\\tutorial\\tutorial ({i%531}).png")
+    img = pygame.image.load(f"tutorial\\tutorial ({i%531}).png")
     trans_img = pygame.transform.scale(img,(size,size))
     screen.blit(trans_img,(0,0))
 
 # create a text screen and return the solution
-def text_screen(size=700, exclude=[]):
+def text_screen(size=700, exclude=dict()):
     test_font = pygame.font.Font(None,size//8)
     d = bbc2.text_screen_random(colorful=True, color_to_not_include=exclude)
     background_surface = pygame.Surface((size,size))
@@ -122,10 +122,13 @@ def game_screens(size=700):
     difficulty = DIFF[DIFFICULTY]
     repetition = rd.randint(1,difficulty['max'])
     correct_color_list = []
+    # correct_text_list = []
     for i in range(repetition):
         correct_color = text_screen(size=size, exclude=correct_color_list)
         pygame.display.update()
-        correct_color_list.append(correct_color['text_color'])
+        # correct_text_list.append(correct_color['text'])
+        correct_color_list.append(correct_color['text'])
+        # correct_color_list.append(correct_color['text_color'])
         time.sleep(difficulty['wait'])
     true_correct_color_list = list(set(correct_color_list))
     return color_screen(true_correct_color_list,size=size)
@@ -229,7 +232,7 @@ def main_game():
     global main_board
     
     video_status = 0
-
+    animation_status = True
     status = 'begin'
     animation_count = 0
 
@@ -238,9 +241,12 @@ def main_game():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                animation_status = False
             if status == 'begin' and event.type == pygame.KEYDOWN:
                 status = 'mode_select'
                 video_status = 0
+                animation_status = True
             elif status == 'mode_select' and event.type == pygame.KEYDOWN:
                 status = 'tutorial'
                 video_status = 0
@@ -256,23 +262,24 @@ def main_game():
             elif status == 'score' and event.type == pygame.KEYDOWN:
                 status = 'game'
 
-        # print(status)
+        # print(animation_status)
 
         if status == 'begin':
-            directory = "C:\\Users\\user\\Desktop\\Python\\BBC\\intro + player_selection\\start to place to join the game"
+            directory = "intro + player_selection\\start to place to join the game"
             name = get_file_name(directory, video_status, 3354)
-            directory_anime = "C:\\Users\\user\\Desktop\\Python\\BBC\\effect_circle\\effect_circle"
-            name_anime = get_file_name(directory_anime, video_status, 118)
             play_vid(name,size=SIZE)
-            play_vid(name_anime,size=SIZE//6,coord=(0,0))
+            if animation_status:
+                directory_anime = "effect_circle\\effect_circle"
+                name_anime = get_file_name(directory_anime, video_status, 118)
+                play_vid(name_anime,size=SIZE//6,coord=(0,0))
             video_status+=1
         elif status == 'mode_select':
-            directory = "C:\\Users\\user\\Desktop\\Python\\BBC\\mode_selection\\mode_selection"
+            directory = "mode_selection\\mode_selection"
             name = get_file_name(directory, video_status, 1785)
             play_vid(name,size=SIZE)
             video_status+=1
         elif status == 'tutorial':
-            directory = "C:\\Users\\user\\Desktop\\Python\\BBC\\tutorial\\tutorial"
+            directory = "tutorial\\tutorial"
             name = get_file_name(directory, video_status, 664)
             play_vid(name,size=SIZE)
             video_status+=1

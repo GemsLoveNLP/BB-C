@@ -38,7 +38,6 @@ def rand_color(colorful=True, n=1):
     return copy[:min(n,len(colors))]
 
 # return a dict of the color for the text_screen. keys = 'text','text_color','background'
-#! color to not include must also include the text itself
 def text_screen_random(colorful=True, color_to_not_include=[]):
     if colorful:
         colors = COLORS_EXTENDED
@@ -56,6 +55,30 @@ def text_screen_random(colorful=True, color_to_not_include=[]):
     dic['text_color'] = temp[1]
     dic['background'] = temp[2]
     return dic
+
+# def text_screen_random2(colorful=True, color_to_not_include=dict()):
+#     if colorful:
+#         colors = COLORS_EXTENDED
+#     else:
+#         colors = COLORS 
+#     color_list = [color for color in colors]
+#     color_set = set(color_list)
+#     exclude_set_text = set(color_to_not_include['text'])
+#     exclude_set_text_color = set(color_to_not_include['text_color'])
+#     copy_set_text = color_set.difference(exclude_set_text)
+#     copy_set_text_color = color_set.difference(exclude_set_text_color)
+#     copy_text = list(copy_set_text)
+#     copy_text_color = list(copy_set_text_color)
+#     rd.shuffle(copy_text)
+#     rd.shuffle(copy_text_color)
+#     rd.shuffle(color_list)
+#     temp_text = copy_text
+#     temp_text_color = copy_text_color
+#     dic = dict()
+#     dic['text'] = temp_text[0]
+#     dic['text_color'] = temp_text_color[1]
+#     dic['background'] = color_list[2]
+#     return dic
 
 # change a n**2 long list to a nxn 2D list
 def to_square_matrix(l):
