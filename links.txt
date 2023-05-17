@@ -1,2 +1,8 @@
 https://www.pygame.org/docs/ref/color_list.html
 https://github.com/GemsLoveNLP/BB-C
+
+
+Python: ภาษาโปรแกรมมิ่งที่ใช้ในการเขียนทั้ง ระบบเกม กราฟฟิคเกม รวมไปถึงการใช้อุปกรณ์ต่าง ๆเช่นกล้อง
+Pycharm: game engine ในภาษา Python ที่ถูกใช้เพื่อการทำกราฟฟิคของตัวเกม
+OpenCV: ระบบการสั่งการกล้องในภาษา Python ที่ถูกใช้เพื่อการถ่ายภาพกระดาน
+Keras: Neural Network ในภาษา Python ที่ถูกใช้เพื่อตรวจคำตอบ

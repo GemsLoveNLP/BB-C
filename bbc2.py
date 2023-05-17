@@ -4,7 +4,7 @@ import random as rd
 GRID_SIZE = 6
 COLORS = ['r','o','y','l','b','v']
 COLORS_EXTENDED = ['r','o','y','g','m','b','w','v','p']
-RANK_COLORS = ['goldenrod', 'silver', 'chocolate1', 'azure4'] 
+RANK_COLORS = ['royalblue', 'crimson', 'hotpink', 'darkorchid'] 
 INFOS = {
         'r': [(51, 115, 219), 'RED'],
         'o': [(255, 140, 26), 'ORANGE'],
@@ -168,9 +168,13 @@ class player:
         self.num = num
         self.name = name
         self.score = score
+        self.status = False
 
     def add_score(self, n=1):
         self.score += n
+
+    def set_status(self, bool):
+        self.status = bool
 
 # ---------------------------------------------------------------------------------------------------
 

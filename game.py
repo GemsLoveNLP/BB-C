@@ -8,16 +8,19 @@ from pyvidplayer import Video
 
 
 #todo config here -------------
-DIFF = {'NORMAL':{'wait':1, 'max':2},'HARD':{'wait':0.8, 'max':4}}
+DIFF = {'NORMAL':{'wait':1, 'max':2, 'max_wait':90},'HARD':{'wait':0.8, 'max':4, 'max_wait':60}}
 
-SIZE = 696      
+SIZE = 660     
 ROUND = 10      
 FRAMERATE = 30
-ANIMATION_THRESHOLD = 20
+ANIMATION_THRESHOLD = 60
+CIRCLE_THRESHOLD = 30
 NUM_PLAYER = 4
 GRID = 6
 DIFFICULTY = 'NORMAL'
 #todo -------------------------
+
+# initializing
 
 pygame.init()
 screen = pygame.display.set_mode((SIZE,SIZE))
@@ -26,40 +29,31 @@ clock = pygame.time.Clock()
 
 p1 = bbc2.player(1,'Sirkle')
 p2 = bbc2.player(2,'Sektor')
-p3 = bbc2.player(3,'Soapoo')
-p4 = bbc2.player(4,'BeeHex')
+p3 = bbc2.player(3,'Parrod')
+p4 = bbc2.player(4,'Hexate')
 p_list = [p1, p2, p3, p4]
 player_list = p_list[0:NUM_PLAYER]
 
-
-# cb_matrix = bbc2.to_square_matrix(bbc2.color_board('b'))
-# main = bbc2.game_board(cb_matrix)
-# print(main)
-# main.player_place_marker(p1,1,1)
-# main.player_place_marker(p2,2,1)
-# main.player_place_marker(p3,1,3)
-# main.player_place_marker(p4,1,4)
-# print(main)
-
+# play a background color (useful when wanting to test screen)
 def play_color(color,size=SIZE):
     bg = pygame.surface.Surface((size,size))
     bg.fill(color)
     screen.blit(bg,(0,0))
 
-# get the file name
+# get the ".png" file name followed by n length string number
 def get_file_name(dir, i, folder_size, n=4):
     i = i%folder_size
     string = dir+"0"*(n-len(str(i)))+str(i)+".png"
     return string
 
-# play a folder frame by frame
-def play_vid(dir,size=700, coord = (0,0)):
+# play a .png file
+def play_vid(dir,size=SIZE, coord = (0,0)):
     img = pygame.image.load(dir)
     trans_img = pygame.transform.scale(img,(size,size))
     screen.blit(trans_img,coord)
 
 # create a begin screen
-def begin_screen(i,size=700):
+# def begin_screen(i,size=SIZE):
     # background = pygame.surface.Surface((size,size))
     # background.fill('black')
     # screen.blit(background,(0,0))
@@ -67,12 +61,12 @@ def begin_screen(i,size=700):
     # header = header_font.render('Press any key to start', True, 'yellow')
     # header_rect = header.get_rect(center=(size//2,size//2))
     # screen.blit(header, header_rect)
-    img = pygame.image.load(f"tutorial\\tutorial ({i%531}).png")
-    trans_img = pygame.transform.scale(img,(size,size))
-    screen.blit(trans_img,(0,0))
+    # img = pygame.image.load(f"tutorial\\tutorial ({i%531}).png")
+    # trans_img = pygame.transform.scale(img,(size,size))
+    # screen.blit(trans_img,(0,0))
 
 # create a text screen and return the solution
-def text_screen(size=700, exclude=dict()):
+def text_screen(size=SIZE, exclude=dict()):
     test_font = pygame.font.Font(None,size//8)
     d = bbc2.text_screen_random(colorful=True, color_to_not_include=exclude)
     background_surface = pygame.Surface((size,size))
@@ -120,69 +114,83 @@ def color_screen(correct_color, size=SIZE):
     screen.blit(trans_bar,(0,0))
     return cb_matrix
 
-# create 1-4 text screen before creating a color screen with the correct colors
-def game_screens(size=700):
+# create sequences of text screens before creating a color screen with the correct colors
+def game_screens(size=SIZE):
     # repetition = number of times the text screen would show
-    global correct_color_list
+    global correct_color_list, correct_list
     difficulty = DIFF[DIFFICULTY]
     repetition = rd.randint(1,difficulty['max'])
     correct_color_list = []
-    # correct_text_list = []
+    correct_list = []
     for i in range(repetition):
         correct_color = text_screen(size=size, exclude=correct_color_list)
         pygame.display.update()
-        # correct_text_list.append(correct_color['text'])
-        correct_color_list.append(correct_color['text'])
-        # correct_color_list.append(correct_color['text_color'])
+        correct_color_list.append(correct_color['text_color'])
+        correct_list.append(correct_color)
         time.sleep(difficulty['wait'])
     true_correct_color_list = list(set(correct_color_list))
+    print(correct_list)
     return color_screen(true_correct_color_list,size=size)
 
 # create a screen of dynamic scores rank from best to worst vertically
-def score_screen(size=700):
+def score_screen(size=SIZE):
     background = pygame.surface.Surface((size,size))
-    background.fill('black')
+    background.fill('white')
     screen.blit(background,(0,0))
     header_font = pygame.font.Font(None,size//8)
-    header = header_font.render('SCORE', True, 'yellow')
+    header = header_font.render('SCORE', True, 'red4')
     header_rect = header.get_rect(center=(size//2,size//9))
     screen.blit(header, header_rect)
-    body_font = pygame.font.Font(None,size//12)
+    body_font = pygame.font.Font(None,size//15)
     d = dict()
-    for p in player_list:
+    for p in player_in_game:
         d[p.name] = p.score
     p_dict = sorted(d,key=d.get)[::-1]
     i = 0  
     for p in p_dict:
-        body_text = f'{p}: {d[p]}'
+        body_text = f'{p}: {d[p]//60}'      #! this is just a quick fix
         body = body_font.render(body_text, True, bbc2.RANK_COLORS[i])
         body_rect = body.get_rect(center=(size//2,size//3.5+i*size//8))
         screen.blit(body, body_rect)
         i+=1
-    inst = header_font.render('Press any key to start',True, 'lawngreen')
+    inst = header_font.render('Press any key to start',True, 'darkorange')
     inst_rect = inst.get_rect(center=(size//2,size - size//6))
     screen.blit(inst, inst_rect)
 
-# animate a png to get progressively larger
-def animate_circle(xy_list, scale, size=700):
+# create the circle that will flash black and white
+def animate_circle(name, wait, time, size=SIZE):
+    true_x = size//2
+    true_y = size//2
+    img = pygame.image.load(name)
+    freq = time*15
+    real_size = size//freq*wait
+    fx = pygame.transform.scale(img, (real_size, real_size))
+    fx_rect = fx.get_rect(center=(true_x,true_y))
+    screen.blit(fx,fx_rect)
+
+# animate the correct piece placement
+def animate_winner(xyplayer_list, video_status, size=SIZE):
     # x, y is coordinate of grid slot 
-    coor_list = []
-    for xy in xy_list:
+    for xy in xyplayer_list:
         x = xy[0]
         y = xy[1]
-        coor_x = x*size//GRID + size//(GRID*2)
-        coor_y = y*size//GRID + size//(GRID*2)
-        coor_list.append((coor_x,coor_y))
-    for xy in coor_list:
-        true_x = xy[0]
-        true_y = xy[1]
-        img = pygame.image.load('ring.png')
-        real_size = size//80+size//120*scale
-        fx = pygame.transform.scale(img, (real_size, real_size))
-        fx_rect = fx.get_rect(center=(true_x,true_y))
-        screen.blit(fx,fx_rect)
+        true_x = x*size//GRID
+        true_y = y*size//GRID
+        if xy[2] == 1:
+            directory_anime = "กลมวืาง\\circle (1)"
+            name_anime = get_file_name(directory_anime, video_status, 112, n=3)
+        elif xy[2] == 2:
+            directory_anime = "พายวิ้ง\\พายวิ้ง (1)"
+            name_anime = get_file_name(directory_anime, video_status, 96, n=3)
+        elif xy[2] == 3:
+            directory_anime = "ใบ\\bi"
+            name_anime = get_file_name(directory_anime, video_status, 112, n=3)
+        elif xy[2] == 4:
+            directory_anime = "เหลี่ยม\\hexa"
+            name_anime = get_file_name(directory_anime, video_status, 112, n=3)
+        play_vid(name_anime,size=SIZE//6,coord=(true_x,true_y))
 
-# draw a board from main
+# draw a static board from the recorded main
 def static_board_screen(size=SIZE):
     for y in range(GRID):
         for x in range(GRID):
@@ -201,44 +209,75 @@ def static_board_screen(size=SIZE):
 
 # psuedo code functions
 
-def get_winner():
-    player_number = rd.randint(1,NUM_PLAYER)
-    return player_number
+# get the player.number of the winning player at the slot x,y if none wins then return 0
+def get_winner(x,y):
+    return 1
 
+# get the piece color of the slot x,y if none then return 
+def get_color(x,y):
+    return 1
+
+# Note: pls switch the functions below in the main loop after finish (line 408)
+
+#! for demo only, the real one is below
 def find_correct_grid():
     xy_list = []
     for correct_color in correct_color_list:
         escape = False
         for y in range(GRID):
             for x in range(GRID):
-                if main_board.board[y][x].color == correct_color:
+                winner = get_winner(x,y)
+                if main_board.board[y][x].color == correct_color and winner != 0:
                     # print(x,y)
-                    xy_list.append((x,y))
+                    xy_list.append((x,y,winner))
+                    player_list[winner-1].add_score(1)
                     escape = True
                 if escape:break
             if escape:break
     return xy_list
 
+# find the grid that the animations will be playing on return (x,y, winning_player.number)
+def find_correct():
+    xy_list = []
+    for correct_color in correct_list:
+        for y in range(GRID):
+            for x in range(GRID):
+                if main_board.board[y][x].color == correct_color['text_color'] and get_color(x,y) == correct_list['text']:
+                    # print(x,y)
+                    win_player_number = get_winner(x,y)
+                    player_list[win_player_number-1].add_score(1)
+                    xy_list.append((x,y,win_player_number))
+    return xy_list
+
+# take photo to be analyze
+def take_photo():
+    return 0
+
 # ------------------------------------------------------------------------------------------------------------
 
 # ? status represents the game status
 # ? status list: 
-# ?    - begin = start page to do num player settings
+# ?    - begin = load screen
+# ?    - join = start page to do num player settings
 # ?    - mode_select = screen to do difficulty settings
 # ?    - tutorial = video of the tutorial
 # ?    - game = display the text then the board
 # ?    - hold = hold the game board in place for checking
+# ?    - animate_white = animation of white circle to take sillouhette picture
+# ?    - animate_black = animation of black circle to take colored picture
 # ?    - animate = animation of placement
 # ?    - score = show score board and press to continue
 
 # ---------------------------------------------------------
 
 def main_game():
-    global main_board
+    global main_board, player_in_game, DIFFICULTY
+
+    status = 'begin'
     
     video_status = 0
-    status = 'begin'
     animation_count = 0
+    wait = 0
 
     while True:
         for event in pygame.event.get():
@@ -249,17 +288,23 @@ def main_game():
 
                 if event.key == pygame.K_1:
                     circle_animation_status = False
+                    p1.set_status(True)
                 if event.key == pygame.K_2:
                     sector_animation_status = False
+                    p2.set_status(True)
                 if event.key == pygame.K_3:
                     pill_animation_status = False
+                    p3.set_status(True)
                 if event.key == pygame.K_4:
                     hex_animation_status = False
+                    p4.set_status(True)
 
                 if event.key == pygame.K_1:
                     beginner_animation_status = False
+                    DIFFICULTY = 'NORMAL'
                 if event.key == pygame.K_2:
                     expert_animation_status = False
+                    DIFFICULTY = 'HARD'
 
                 if status == 'begin':
                     circle_animation_status = True
@@ -271,20 +316,19 @@ def main_game():
                 elif status == 'join' and event.key == pygame.K_SPACE:
                     beginner_animation_status = True
                     expert_animation_status = True
+                    player_in_game = []
+                    for pi in [p1,p2,p3,p4]:
+                        if pi.status:
+                            player_in_game.append(pi)
+                    print(player_in_game)
                     status = 'mode_select'
                     video_status = 0
-                elif status == 'mode_select' and event.key == pygame.K_SPACE:
+                elif status == 'mode_select':
+                    print(DIFFICULTY)
                     status = 'tutorial'
                     video_status = 0
                 elif status == 'tutorial':
                     status = 'game'
-                elif status == 'hold':
-                    #!----------------------------------------------
-                    for _ in range(len(correct_color_list)):
-                        player_list[get_winner()-1].score+=1
-                    #!----------------------------------------------
-                    animation_count = 0
-                    status = 'animate'
                 elif status == 'score':
                     status = 'game'
 
@@ -306,19 +350,19 @@ def main_game():
             if hex_animation_status:
                 directory_anime = "เหลี่ยม\\hexa"
                 name_anime = get_file_name(directory_anime, video_status, 112, n=3)
-                play_vid(name_anime,size=SIZE//6,coord=(SIZE/6*5,SIZE/6*5))
+                play_vid(name_anime,size=SIZE//6,coord=(0,SIZE/6*5))
             if sector_animation_status:
                 directory_anime = "พายวิ้ง\\พายวิ้ง (1)"
                 name_anime = get_file_name(directory_anime, video_status, 96, n=3)
-                play_vid(name_anime,size=SIZE//6,coord=(0,SIZE/6*5))
+                play_vid(name_anime,size=SIZE//6,coord=(SIZE/6*5,0))
             if pill_animation_status:
                 directory_anime = "ใบ\\bi"
                 name_anime = get_file_name(directory_anime, video_status, 112, n=3)
-                play_vid(name_anime,size=SIZE//6,coord=(SIZE/6*5,0))
+                play_vid(name_anime,size=SIZE//6,coord=(SIZE/6*5,SIZE/6*5))
             video_status+=1
         elif status == 'mode_select':
-            directory = "mode_selection\\mode_selection"
-            name = get_file_name(directory, video_status, 1785)
+            directory = "3-select mode\\select"
+            name = get_file_name(directory, video_status, 1302)
             play_vid(name,size=SIZE)
             if beginner_animation_status:
                 directory_anime = "กลมวืาง\\circle (1)"
@@ -334,21 +378,44 @@ def main_game():
             name = get_file_name(directory, video_status, 414)
             play_vid(name,size=SIZE)
             video_status+=1
-        elif status == 'score':
-            score_screen(size=SIZE)
         elif status == 'game':
             cb_mat = game_screens(size=SIZE)
             main_board = bbc2.game_board(cb_mat)
             print(main_board)
             status = 'hold'
+            wait = 0
+        elif status == 'hold' and wait > DIFF[DIFFICULTY]['max_wait']:
+            status = 'animate_white'
+            wait = 0
+        elif status == 'animate_white':
+            if wait > CIRCLE_THRESHOLD:
+                take_photo()    #! psuedo function
+                status = 'animate_black'
+                wait = 0
+            else:
+                # print('black')
+                animate_circle('black_cir.png', wait, 1, size=SIZE)
+        elif status == 'animate_black':
+            if wait > CIRCLE_THRESHOLD:
+                take_photo()    #! psuedo function
+                status = 'animate'
+                wait = 0
+            else:
+                # print('white')
+                animate_circle('white_cir.png', wait, 1, size=SIZE)
         elif status == 'animate':
             static_board_screen(size=SIZE)
-            animate_circle(find_correct_grid(),animation_count,size=SIZE) #!find_correct_grid()
+            animate_winner(find_correct_grid(),animation_count,size=SIZE) #!find_correct_grid() has to be changed to find_correct
             animation_count+=1
+        elif status == 'score':
+            score_screen(size=SIZE)
+
 
         if animation_count >= ANIMATION_THRESHOLD:
             status = 'score'
             animation_count = 0
+
+        wait+=1
 
         pygame.display.update()
         # time.sleep(bbc2.NORMAL['wait'])
