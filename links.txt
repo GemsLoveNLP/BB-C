@@ -6,3 +6,14 @@ Python: ภาษาโปรแกรมมิ่งที่ใช้ในก
 Pycharm: game engine ในภาษา Python ที่ถูกใช้เพื่อการทำกราฟฟิคของตัวเกม
 OpenCV: ระบบการสั่งการกล้องในภาษา Python ที่ถูกใช้เพื่อการถ่ายภาพกระดาน
 Keras: Neural Network ในภาษา Python ที่ถูกใช้เพื่อตรวจคำตอบ
+
+Todo:
+1. take_photo(): take a photo of the board
+2. get_winner(x,y): check the player type and return the corresponding player number of the cell at x,y
+3. get_color(x,y): return the color placed at the spot x,y if nothing return 'black'
+4. replace the find_correct_grid() function in the main loop with find_correct()
+
+idea:
+You may write a function that extract the info from the AI as a matrix that contains the color and player of each grid, 
+then get_winner and get_color is just accessing the data stored in the matrix.
+This way, the 2 models are only needed to be activated twice

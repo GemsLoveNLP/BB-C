@@ -207,7 +207,11 @@ def static_board_screen(size=SIZE):
 
 # -----------------------------------------------------------------------------------------------------------
 
-# psuedo code functions
+# psuedo code functions----------------------------------------------------------------------
+
+# take photo to be analyze
+def take_photo():
+    return 0
 
 # get the player.number of the winning player at the slot x,y if none wins then return 0
 def get_winner(x,y):
@@ -248,10 +252,6 @@ def find_correct():
                     player_list[win_player_number-1].add_score(1)
                     xy_list.append((x,y,win_player_number))
     return xy_list
-
-# take photo to be analyze
-def take_photo():
-    return 0
 
 # ------------------------------------------------------------------------------------------------------------
 
