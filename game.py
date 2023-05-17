@@ -10,7 +10,7 @@ from pyvidplayer import Video
 #todo config here -------------
 DIFF = {'NORMAL':{'wait':1, 'max':2},'HARD':{'wait':0.8, 'max':4}}
 
-SIZE = 750      
+SIZE = 696      
 ROUND = 10      
 FRAMERATE = 30
 ANIMATION_THRESHOLD = 20
@@ -41,10 +41,15 @@ player_list = p_list[0:NUM_PLAYER]
 # main.player_place_marker(p4,1,4)
 # print(main)
 
+def play_color(color,size=SIZE):
+    bg = pygame.surface.Surface((size,size))
+    bg.fill(color)
+    screen.blit(bg,(0,0))
+
 # get the file name
-def get_file_name(dir, i, folder_size):
+def get_file_name(dir, i, folder_size, n=4):
     i = i%folder_size
-    string = dir+"0"*(4-len(str(i)))+str(i)+".png"
+    string = dir+"0"*(n-len(str(i)))+str(i)+".png"
     return string
 
 # play a folder frame by frame
@@ -232,7 +237,6 @@ def main_game():
     global main_board
     
     video_status = 0
-    animation_status = True
     status = 'begin'
     animation_count = 0
 
@@ -241,46 +245,93 @@ def main_game():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                animation_status = False
-            if status == 'begin' and event.type == pygame.KEYDOWN:
-                status = 'mode_select'
-                video_status = 0
-                animation_status = True
-            elif status == 'mode_select' and event.type == pygame.KEYDOWN:
-                status = 'tutorial'
-                video_status = 0
-            elif status == 'tutorial' and event.type == pygame.KEYDOWN:
-                status = 'game'
-            elif status == 'hold' and event.type == pygame.KEYDOWN:
-                #!----------------------------------------------
-                for _ in range(len(correct_color_list)):
-                    player_list[get_winner()-1].score+=1
-                #!----------------------------------------------
-                animation_count = 0
-                status = 'animate'
-            elif status == 'score' and event.type == pygame.KEYDOWN:
-                status = 'game'
+            if event.type == pygame.KEYDOWN:
+
+                if event.key == pygame.K_1:
+                    circle_animation_status = False
+                if event.key == pygame.K_2:
+                    sector_animation_status = False
+                if event.key == pygame.K_3:
+                    pill_animation_status = False
+                if event.key == pygame.K_4:
+                    hex_animation_status = False
+
+                if event.key == pygame.K_1:
+                    beginner_animation_status = False
+                if event.key == pygame.K_2:
+                    expert_animation_status = False
+
+                if status == 'begin':
+                    circle_animation_status = True
+                    sector_animation_status = True
+                    pill_animation_status = True
+                    hex_animation_status = True
+                    status = 'join'
+                    video_status = 0
+                elif status == 'join' and event.key == pygame.K_SPACE:
+                    beginner_animation_status = True
+                    expert_animation_status = True
+                    status = 'mode_select'
+                    video_status = 0
+                elif status == 'mode_select' and event.key == pygame.K_SPACE:
+                    status = 'tutorial'
+                    video_status = 0
+                elif status == 'tutorial':
+                    status = 'game'
+                elif status == 'hold':
+                    #!----------------------------------------------
+                    for _ in range(len(correct_color_list)):
+                        player_list[get_winner()-1].score+=1
+                    #!----------------------------------------------
+                    animation_count = 0
+                    status = 'animate'
+                elif status == 'score':
+                    status = 'game'
 
         # print(animation_status)
 
         if status == 'begin':
-            directory = "intro + player_selection\\start to place to join the game"
-            name = get_file_name(directory, video_status, 3354)
+            directory = "1-loading\\loding screen (2)"
+            name = get_file_name(directory, video_status, 908)
             play_vid(name,size=SIZE)
-            if animation_status:
-                directory_anime = "effect_circle\\effect_circle"
-                name_anime = get_file_name(directory_anime, video_status, 118)
+            video_status+=1
+        elif status == 'join':
+            directory = f"2-join the game\\join"
+            name = get_file_name(directory, video_status, 1910)
+            play_vid(name,size=SIZE)
+            if circle_animation_status:
+                directory_anime = "กลมวืาง\\circle (1)"
+                name_anime = get_file_name(directory_anime, video_status, 112, n=3)
                 play_vid(name_anime,size=SIZE//6,coord=(0,0))
+            if hex_animation_status:
+                directory_anime = "เหลี่ยม\\hexa"
+                name_anime = get_file_name(directory_anime, video_status, 112, n=3)
+                play_vid(name_anime,size=SIZE//6,coord=(SIZE/6*5,SIZE/6*5))
+            if sector_animation_status:
+                directory_anime = "พายวิ้ง\\พายวิ้ง (1)"
+                name_anime = get_file_name(directory_anime, video_status, 96, n=3)
+                play_vid(name_anime,size=SIZE//6,coord=(0,SIZE/6*5))
+            if pill_animation_status:
+                directory_anime = "ใบ\\bi"
+                name_anime = get_file_name(directory_anime, video_status, 112, n=3)
+                play_vid(name_anime,size=SIZE//6,coord=(SIZE/6*5,0))
             video_status+=1
         elif status == 'mode_select':
             directory = "mode_selection\\mode_selection"
             name = get_file_name(directory, video_status, 1785)
             play_vid(name,size=SIZE)
+            if beginner_animation_status:
+                directory_anime = "กลมวืาง\\circle (1)"
+                name_anime = get_file_name(directory_anime, video_status, 112, n=3)
+                play_vid(name_anime,size=SIZE//6,coord=(0,SIZE/6*5))
+            if expert_animation_status:
+                directory_anime = "กลมวืาง\\circle (1)"
+                name_anime = get_file_name(directory_anime, video_status, 112, n=3)
+                play_vid(name_anime,size=SIZE//6,coord=(SIZE/6*5,SIZE/6*5))
             video_status+=1
         elif status == 'tutorial':
-            directory = "tutorial\\tutorial"
-            name = get_file_name(directory, video_status, 664)
+            directory = "4-starting\\starting"
+            name = get_file_name(directory, video_status, 414)
             play_vid(name,size=SIZE)
             video_status+=1
         elif status == 'score':
@@ -303,57 +354,20 @@ def main_game():
         # time.sleep(bbc2.NORMAL['wait'])
         clock.tick(FRAMERATE)
 
+main_game()
 
-# def full_game(name, name2, size=700):
-#     global NUM_PLAYER, DIFFICULTY
+# full_game('Gems.mp4', 'Gems.mp4', size=SIZE)
 
-#     # first video
-
-#     vid = Video(name)
-#     vid.set_size((size,size))
-
-#     # similar to status, but is used to select the correct video to show
-
-#     vid_status = 0
-
-#     # vid.draw(screen, (0,0))
-#     # pygame.display.update()
-
+# def test_func(f):
 #     while True:
-#         vid.draw(screen, (0,0))
-#         # sprite = pygame.image.load('1.png')
-#         # screen.blit(sprite,(0,0))
-#         pygame.display.update()
 #         for event in pygame.event.get():
 #             if event.type == pygame.QUIT:
 #                 pygame.quit()
 #                 exit()
-#             if event.type == pygame.KEYDOWN and vid_status == 0:
-                
-#                 #todo set the number of players using the camera
-#                 NUM_PLAYER = 4
 
-#                 vid.close()
+#         f('white')
+#         pygame.display.update()
+#         # time.sleep(bbc2.NORMAL['wait'])
+#         clock.tick(FRAMERATE)
 
-#                 pygame.display.update()
-
-#                 vid_status+=1
-#                 vid = Video(name2)
-#                 vid.set_size((size,size))
-#                 vid.draw(screen, (0,0))
-
-#             elif event.type == pygame.KEYDOWN and vid_status == 1:
-                
-#                 #todo set the difficulty using the camera
-#                 DIFFICULTY = 'NORMAL'
-
-#                 vid.close()
-
-#                 pygame.display.update()
-
-#                 main_game()
-
-
-main_game()
-
-# full_game('Gems.mp4', 'Gems.mp4', size=SIZE)
+# test_func(play_color)
