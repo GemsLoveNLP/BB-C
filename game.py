@@ -215,6 +215,7 @@ def take_photo():
 
 # get the player.number of the winning player at the slot x,y if none wins then return False
 def get_winner(x,y):
+    if (x,y) == (0,0):return 0
     return 1
 
 # get the piece color of the slot x,y if none then return 'black
@@ -222,7 +223,7 @@ def get_color(x,y):
     return 1
 
 def get_cornor_winner():
-    return sum([get_winner(x,y) for x,y in [(0,0,),(0,5),(5,5),(5,0)]]) == 0
+    return sum([0 if get_color(x,y) != '0' else 1 for x,y in [(0,0,),(0,5),(5,5),(5,0)]]) == 0
 
 # Note: pls switch the functions below in the main loop after finish (line 408)
 
@@ -429,8 +430,6 @@ def main_game():
         # time.sleep(bbc2.NORMAL['wait'])
         clock.tick(FRAMERATE)
 
-main_game()
-
 # full_game('Gems.mp4', 'Gems.mp4', size=SIZE)
 
 # def test_func(f):
@@ -484,11 +483,15 @@ def main_game2():
                     join_key = True
 
                 if event.key == pygame.K_1 or get_winner(0,5) != 0:
+                    print('1')
                     beginner_animation_status = False
                     DIFFICULTY = 'NORMAL'
+                    mode_key = True
                 if event.key == pygame.K_2 or get_winner(5,5) != 0:
+                    print('2')
                     expert_animation_status = False
                     DIFFICULTY = 'HARD'
+                    mode_key = True
 
                 if status == 'begin':
                     circle_animation_status = True
@@ -507,7 +510,7 @@ def main_game2():
                     print(player_in_game)
                     status = 'mode_select'
                     video_status = 0
-                elif status == 'mode_select' and (get_cornor_winner() and mode_key):
+                elif status == 'mode_select' and mode_key:
                     print(DIFFICULTY)
                     status = 'tutorial'
                     video_status = 0
@@ -546,6 +549,23 @@ def main_game2():
             video_status+=1
 
             take_photo()
+
+            if get_winner(0,0) != 0:
+                    circle_animation_status = False
+                    p1.set_status(True)
+                    join_key = True
+            if get_winner(5,0) != 0:
+                    sector_animation_status = False
+                    p2.set_status(True)
+                    join_key = True
+            if get_winner(5,5) != 0:
+                    pill_animation_status = False
+                    p3.set_status(True)
+                    join_key = True
+            if get_winner(0,5) != 0:
+                    hex_animation_status = False
+                    p4.set_status(True)
+                    join_key = True      
 
         elif status == 'mode_select':
             directory = "3-select mode\\select"
@@ -607,3 +627,5 @@ def main_game2():
         pygame.display.update()
         # time.sleep(bbc2.NORMAL['wait'])
         clock.tick(FRAMERATE)
+
+main_game()
