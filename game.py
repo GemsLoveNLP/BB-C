@@ -213,13 +213,16 @@ def static_board_screen(size=SIZE):
 def take_photo():
     return 0
 
-# get the player.number of the winning player at the slot x,y if none wins then return 0
+# get the player.number of the winning player at the slot x,y if none wins then return False
 def get_winner(x,y):
     return 1
 
-# get the piece color of the slot x,y if none then return 
+# get the piece color of the slot x,y if none then return 'black
 def get_color(x,y):
     return 1
+
+def get_cornor_winner():
+    return sum([get_winner(x,y) for x,y in [(0,0,),(0,5),(5,5),(5,0)]]) == 0
 
 # Note: pls switch the functions below in the main loop after finish (line 408)
 
@@ -278,6 +281,7 @@ def main_game():
     video_status = 0
     animation_count = 0
     wait = 0
+    join_key = False
 
     while True:
         for event in pygame.event.get():
@@ -289,15 +293,19 @@ def main_game():
                 if event.key == pygame.K_1:
                     circle_animation_status = False
                     p1.set_status(True)
+                    join_key = True
                 if event.key == pygame.K_2:
                     sector_animation_status = False
                     p2.set_status(True)
+                    join_key = True
                 if event.key == pygame.K_3:
                     pill_animation_status = False
                     p3.set_status(True)
+                    join_key = True
                 if event.key == pygame.K_4:
                     hex_animation_status = False
                     p4.set_status(True)
+                    join_key = True
 
                 if event.key == pygame.K_1:
                     beginner_animation_status = False
@@ -438,3 +446,164 @@ main_game()
 #         clock.tick(FRAMERATE)
 
 # test_func(play_color)
+
+def main_game2():
+    global main_board, player_in_game, DIFFICULTY
+
+    status = 'begin'
+    
+    video_status = 0
+    animation_count = 0
+    wait = 0
+
+    join_key = False
+    mode_key = False
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.KEYDOWN:
+
+                if event.key == pygame.K_1 or get_winner(0,0) != 0:
+                    circle_animation_status = False
+                    p1.set_status(True)
+                    join_key = True
+                if event.key == pygame.K_2 or get_winner(5,0) != 0:
+                    sector_animation_status = False
+                    p2.set_status(True)
+                    join_key = True
+                if event.key == pygame.K_3 or get_winner(5,5) != 0:
+                    pill_animation_status = False
+                    p3.set_status(True)
+                    join_key = True
+                if event.key == pygame.K_4 or get_winner(0,5) != 0:
+                    hex_animation_status = False
+                    p4.set_status(True)
+                    join_key = True
+
+                if event.key == pygame.K_1 or get_winner(0,5) != 0:
+                    beginner_animation_status = False
+                    DIFFICULTY = 'NORMAL'
+                if event.key == pygame.K_2 or get_winner(5,5) != 0:
+                    expert_animation_status = False
+                    DIFFICULTY = 'HARD'
+
+                if status == 'begin':
+                    circle_animation_status = True
+                    sector_animation_status = True
+                    pill_animation_status = True
+                    hex_animation_status = True
+                    status = 'join'
+                    video_status = 0
+                elif status == 'join' and (event.key == pygame.K_SPACE  or (get_cornor_winner() and join_key)):
+                    beginner_animation_status = True
+                    expert_animation_status = True
+                    player_in_game = []
+                    for pi in [p1,p2,p3,p4]:
+                        if pi.status:
+                            player_in_game.append(pi)
+                    print(player_in_game)
+                    status = 'mode_select'
+                    video_status = 0
+                elif status == 'mode_select' and (get_cornor_winner() and mode_key):
+                    print(DIFFICULTY)
+                    status = 'tutorial'
+                    video_status = 0
+                elif status == 'tutorial':
+                    status = 'game'
+                elif status == 'score':
+                    status = 'game'
+
+        # print(animation_status)
+
+        if status == 'begin':
+            directory = "1-loading\\loding screen (2)"
+            name = get_file_name(directory, video_status, 908)
+            play_vid(name,size=SIZE)
+            video_status+=1
+        elif status == 'join':
+            directory = f"2-join the game\\join"
+            name = get_file_name(directory, video_status, 1910)
+            play_vid(name,size=SIZE)
+            if circle_animation_status:
+                directory_anime = "กลมวืาง\\circle (1)"
+                name_anime = get_file_name(directory_anime, video_status, 112, n=3)
+                play_vid(name_anime,size=SIZE//6,coord=(0,0))
+            if hex_animation_status:
+                directory_anime = "เหลี่ยม\\hexa"
+                name_anime = get_file_name(directory_anime, video_status, 112, n=3)
+                play_vid(name_anime,size=SIZE//6,coord=(0,SIZE/6*5))
+            if sector_animation_status:
+                directory_anime = "พายวิ้ง\\พายวิ้ง (1)"
+                name_anime = get_file_name(directory_anime, video_status, 96, n=3)
+                play_vid(name_anime,size=SIZE//6,coord=(SIZE/6*5,0))
+            if pill_animation_status:
+                directory_anime = "ใบ\\bi"
+                name_anime = get_file_name(directory_anime, video_status, 112, n=3)
+                play_vid(name_anime,size=SIZE//6,coord=(SIZE/6*5,SIZE/6*5))
+            video_status+=1
+
+            take_photo()
+
+        elif status == 'mode_select':
+            directory = "3-select mode\\select"
+            name = get_file_name(directory, video_status, 1302)
+            play_vid(name,size=SIZE)
+            if beginner_animation_status:
+                directory_anime = "กลมวืาง\\circle (1)"
+                name_anime = get_file_name(directory_anime, video_status, 112, n=3)
+                play_vid(name_anime,size=SIZE//6,coord=(0,SIZE/6*5))
+            if expert_animation_status:
+                directory_anime = "กลมวืาง\\circle (1)"
+                name_anime = get_file_name(directory_anime, video_status, 112, n=3)
+                play_vid(name_anime,size=SIZE//6,coord=(SIZE/6*5,SIZE/6*5))
+            video_status+=1
+        elif status == 'tutorial':
+            directory = "4-starting\\starting"
+            name = get_file_name(directory, video_status, 414)
+            play_vid(name,size=SIZE)
+            video_status+=1
+        elif status == 'game':
+            cb_mat = game_screens(size=SIZE)
+            main_board = bbc2.game_board(cb_mat)
+            print(main_board)
+            status = 'hold'
+            wait = 0
+        elif status == 'hold' and wait > DIFF[DIFFICULTY]['max_wait']:
+            status = 'animate_white'
+            wait = 0
+        elif status == 'animate_white':
+            if wait > CIRCLE_THRESHOLD:
+                take_photo()    #! psuedo function
+                status = 'animate_black'
+                wait = 0
+            else:
+                # print('black')
+                animate_circle('black_cir.png', wait, 1, size=SIZE)
+        elif status == 'animate_black':
+            if wait > CIRCLE_THRESHOLD:
+                take_photo()    #! psuedo function
+                status = 'animate'
+                wait = 0
+            else:
+                # print('white')
+                animate_circle('white_cir.png', wait, 1, size=SIZE)
+        elif status == 'animate':
+            static_board_screen(size=SIZE)
+            animate_winner(find_correct_grid(),animation_count,size=SIZE) #!find_correct_grid() has to be changed to find_correct
+            animation_count+=1
+        elif status == 'score':
+            score_screen(size=SIZE)
+
+
+        if animation_count >= ANIMATION_THRESHOLD:
+            status = 'score'
+            animation_count = 0
+
+        wait+=1
+
+        pygame.display.update()
+        # time.sleep(bbc2.NORMAL['wait'])
+        clock.tick(FRAMERATE)
